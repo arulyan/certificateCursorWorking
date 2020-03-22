@@ -1,0 +1,71 @@
+<h1><%=url%></h1>
+
+<canvas id="hotspot_image" width="<%=width%>" height="<%=height%>" name="hotspot_image" onclick="clickHotspotImage(event);" style="cursor:crosshair;background:url(<%=url%>);background-size:contain;background-repeat: no-repeat"></canvas>
+
+<!-- <canvas id="canvas">
+<img id="hotspot_image" name="hotspot_image" style="width: 50%;cursor:crosshair;" alt="Hotspot image"
+    onclick="clickHotspotImage(event);" src="<%=url%>" />
+</canvas> -->
+
+<form method="post" action="/resize/uploads/<%=name%>">
+    <h1>Width of image</h1>
+    <p id="wid"><%=width%></p>
+    <h1>Height of image</h1>
+    <p id="hei"><%=height%></p>
+    <h3>x-coordinate:</h3>
+    <input id="x" name="x">
+    <h3>y-coordinate:</h3>
+    <input id="y" name="y">
+    <input type="submit" value="Resize Image" />
+</form>
+
+<script>
+    function clickHotspotImage(event) {
+        //Getting the Canvas Height and Width
+        var img = document.getElementById('hotspot_image');
+        var width = img.clientWidth;
+        var height = img.clientHeight;
+        console.log("The Width is:" + width + "and the height is:" + height + "\n")
+
+        console.log("Hello ejs!");
+
+        //Getting the cursor coordinates
+        var xCoordinate = event.offsetX;
+        var yCoordinate = event.offsetY;
+        console.log("xCoordinate:" + xCoordinate + "\n" + "yCoordinate:" + yCoordinate)
+        var wid = document.getElementById('wid').innerHTML
+        var hei = document.getElementById('hei').innerHTML
+        document.getElementById('x').value = xCoordinate * wid / width
+        document.getElementById('y').value = yCoordinate * hei / height
+        console.log(xCoordinate * wid / width)
+    }
+
+    const can = document.getElementById('hotspot_image');
+    var ctx = can.getContext('2d')
+
+    can.onclick = function (e) {
+        console.log("Hello!")
+        getPosition(e);
+    }
+
+    var pointSize = 10;
+
+    function getPosition(event) {
+        var rect = can.getBoundingClientRect();
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
+        console.log("rolii:"+x)
+        drawCoordinates(x, y);
+    }
+
+    function drawCoordinates(x, y) {
+        // var ctx = document.getElementById("hotspot_image").getContext("2d");
+
+        ctx.clearRect(0, 0, can.width, can.height);
+        ctx.fillStyle = "#ff2626"; // Red color
+
+        ctx.beginPath();
+        ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
+        ctx.fill();
+    }
+</script>
