@@ -1,11 +1,8 @@
 <h1><%=url%></h1>
 
-<canvas id="hotspot_image" width="<%=width%>" height="<%=height%>" name="hotspot_image" onclick="clickHotspotImage(event);" style="cursor:crosshair;background:url(<%=url%>);background-size:contain;background-repeat: no-repeat"></canvas>
-
-<!-- <canvas id="canvas">
-<img id="hotspot_image" name="hotspot_image" style="width: 50%;cursor:crosshair;" alt="Hotspot image"
-    onclick="clickHotspotImage(event);" src="<%=url%>" />
-</canvas> -->
+<canvas id="hotspot_image" width="<%=width%>" height="<%=height%>" name="hotspot_image"
+    onclick="clickHotspotImage(event);"
+    style="cursor:crosshair;background:url(<%=url%>);background-size:contain;background-repeat: no-repeat"></canvas>
 
 <form method="post" action="/resize/uploads/<%=name%>">
     <h1>Width of image</h1>
@@ -20,47 +17,39 @@
 </form>
 
 <script>
-    function clickHotspotImage(event) {
-        //Getting the Canvas Height and Width
-        var img = document.getElementById('hotspot_image');
-        var width = img.clientWidth;
-        var height = img.clientHeight;
-        console.log("The Width is:" + width + "and the height is:" + height + "\n")
 
-        console.log("Hello ejs!");
+    //Get the dimensions
+    var wid = document.getElementById('wid').innerHTML
+    var hei = document.getElementById('hei').innerHTML
+    const ratio = wid / hei
+    console.log("ratio:" + ratio)
 
-        //Getting the cursor coordinates
-        var xCoordinate = event.offsetX;
-        var yCoordinate = event.offsetY;
-        console.log("xCoordinate:" + xCoordinate + "\n" + "yCoordinate:" + yCoordinate)
-        var wid = document.getElementById('wid').innerHTML
-        var hei = document.getElementById('hei').innerHTML
-        document.getElementById('x').value = xCoordinate * wid / width
-        document.getElementById('y').value = yCoordinate * hei / height
-        console.log(xCoordinate * wid / width)
-    }
-
+    //Build Canvas
     const can = document.getElementById('hotspot_image');
     var ctx = can.getContext('2d')
 
+    //Event listener for selecting coordinates
     can.onclick = function (e) {
         console.log("Hello!")
         getPosition(e);
     }
 
+    //Dot Size
     var pointSize = 10;
 
+    //Get coordinates
     function getPosition(event) {
-        var rect = can.getBoundingClientRect();
-        var x = event.clientX - rect.left;
-        var y = event.clientY - rect.top;
-        console.log("rolii:"+x)
+        var rect = can.getBoundingClientRect(); //get position relative to the viewPort
+        var x = event.clientX - rect.left; //x-coordinate on canvas
+        var y = event.clientY - rect.top; //y-'''
+        console.log("x-coordinate:" + x + "\ny-coordinate:" + y)
+        document.getElementById('x').value = x/wid
+        document.getElementById('y').value = y/hei
         drawCoordinates(x, y);
     }
 
     function drawCoordinates(x, y) {
-        // var ctx = document.getElementById("hotspot_image").getContext("2d");
-
+        
         ctx.clearRect(0, 0, can.width, can.height);
         ctx.fillStyle = "#ff2626"; // Red color
 

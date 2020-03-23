@@ -39,17 +39,31 @@ app.post('/', upload.single('image'), (req, res, next) => {
         var correctPath = normalize(req.file.path)
         console.log(correctPath)
         const dimensions = imagesize(req.file.path)
-        res.render('image.ejs', { url: correctPath, name: req.file.filename, width: dimensions.width, height: dimensions.height })
+        var widthO = dimensions.width
+        var heightO = dimensions.height
+        const ratio = widthO/heightO
+        console.log(widthO+" lol: "+heightO+" blahblah "+ratio)
+        if(widthO>800) {
+            widthO = 800
+            heightO = widthO/ratio
+        }
+        res.render('image.ejs', { url: correctPath, name: req.file.filename, width: widthO, height: heightO })
         // res.send("Image Uploaded")
     }
 })
 
 app.post('/resize/uploads/:path', (req, res) => {
-    var image = req.params.path
+    var image = "./uploads/"+req.params.path
+    const dimensions = imagesize(image)
+    const origWidth = dimensions.width
+    const origHeight = dimensions.height
+    console.log("Brosky Dosky"+origWidth)
     var xx = req.body.x
     var yy = req.body.y
+    xx *= origWidth
+    yy *= origHeight
     // .resize(width, height)
-    const img = gm('uploads/' + image)
+    const img = gm(image)
         .fill('#000000')
         .font('Arial', 80)
         // .drawText(225, 75, "Some text");
