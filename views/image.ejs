@@ -13,10 +13,30 @@
     <input id="x" name="x">
     <h3>y-coordinate:</h3>
     <input id="y" name="y">
-    <input type="submit" value="Resize Image" />
+    <input type="submit" value="Preview Image" />
+
+    <!-- Font Color -->
+    <h2>Font Color</h2>
+    <input name="Color Picker" id="oh" type="color" onchange="changeFontColor()" />
+    <input id="h" name="fontColor" value="#000000"/>
+
+    <!-- Font Size -->
+    <h2>Font-Size</h2>
+    <input type="number" id="fSize" name="fontSize" value="80" />
+
 </form>
 
+<!-- <h2 id="myDIV">Preview</h2>
+<img src="../modified/output-7-3-2020.png" id="ima"> -->
 <script>
+
+    // Font-color Dom
+    function changeFontColor() {
+        var k = document.getElementById("oh").value;
+        document.getElementById("h").innerHTML = k;
+        document.getElementById("h").value = k;
+
+    }
 
     //Get the dimensions
     var wid = document.getElementById('wid').innerHTML
@@ -43,18 +63,29 @@
         var x = event.clientX - rect.left; //x-coordinate on canvas
         var y = event.clientY - rect.top; //y-'''
         console.log("x-coordinate:" + x + "\ny-coordinate:" + y)
-        document.getElementById('x').value = x/wid
-        document.getElementById('y').value = y/hei
+        document.getElementById('x').value = x / wid
+        document.getElementById('y').value = y / hei
         drawCoordinates(x, y);
     }
 
     function drawCoordinates(x, y) {
-        
+
         ctx.clearRect(0, 0, can.width, can.height);
         ctx.fillStyle = "#ff2626"; // Red color
 
         ctx.beginPath();
         ctx.arc(x, y, pointSize, 0, Math.PI * 2, true);
         ctx.fill();
+    }
+
+    // Show/Hide Preview
+    function myFunction() {
+        var x = document.getElementById("myDIV");
+        var y = document.getElementById("ima");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
     }
 </script>
