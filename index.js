@@ -92,12 +92,16 @@ app.post('/uploadCertificate/resize/uploads/:path', (req, res) => {
     mrY = (req.body.b)*origHeight/tempHeight;
     mrWidth = (req.body.c)*origWidth/tempWidth;
     mrHeight = (req.body.d)*origHeight/tempHeight;
+    coorObj = JSON.parse(req.body.e)
+    console.log("Lets See how the trial looks like:\n"+coorObj.a)
     const img = gm(image)
         .fill(fontColor)
         .font('Arial', fontSize)
     // img.resize(width, height)
     // console.log("xx:" + xx + "\n" + "yy:" + yy)
     img.region(mrWidth, mrHeight, mrX, mrY).drawText(0, 0, 'John Doe', 'center');
+    // img.region(mrWidth, mrHeight, mrX, mrY).drawText(300,300,'22-may-2020')
+    // img.region(mrWidth, mrHeight, mrX, mrY).drawText(600,600,"World Champion")
     // img.drawText(500, 500, "Arulyan Asokan");
     var outputImgPath = '/modified/output' + '-' + day + '-' + month + '-' + year + '.png'
 

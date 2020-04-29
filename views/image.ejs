@@ -14,6 +14,7 @@
     <input type="hidden" id="yStart" name="b">
     <input type="hidden" id="wid" name="c">
     <input type="hidden" id="hei" name="d"> 
+    <input type="hidden" id="trial" name="e">
     <!-- Font Color -->
     <h2>Font Color</h2>
     <input name="Color Picker" id="oh" type="color" onchange="changeFontColor()" />
@@ -185,13 +186,17 @@
         b = rect.startY;
         c = rect.w;
         d = rect.h;
-        // boxData = {
-        //     a, b, c, d
-        // }
+        var boxData = {
+            "a":rect.startX,
+            "b":rect.startY,
+            "c":rect.w,
+            "d":rect.h
+        }
         document.getElementById("xStart").value = a;
         document.getElementById("yStart").value = b;
         document.getElementById("wid").value = c;
         document.getElementById("hei").value = d;
+        document.getElementById("trial").value = JSON.stringify(boxData);
         ctx.rect(rect.startX, rect.startY, rect.w, rect.h);
         ctx.stroke();
         console.log("startX:" + rect.startX + " startY:" + rect.startY + "\nrect.w:" + rect.w + " rect.h:" + rect.h)
