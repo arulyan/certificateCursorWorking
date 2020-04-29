@@ -25,6 +25,7 @@
     <button type="submit">Mortal Kombat</button>
     <!-- <button type="button" onclick="getHim()">Get Him</button> -->
 </form>
+    <input type="hidden" value="<%=keys%>" id="myKeys">
 <!-- <button type="button" onclick="fo()">Submit Form</button> -->
 <!-- <h2 id="myDIV">Preview</h2>
 <img src="../modified/output-7-3-2020.png" id="ima"> -->
@@ -54,6 +55,14 @@
     //         console.log(res)
     //     })
     // }
+    var keyEle = []
+    keyEle = document.getElementById("myKeys").value
+    separratedKeyEle = keyEle.split(',')
+    console.log(typeof(separratedKeyEle))
+    for(var i=0;i<keyEle.length;i++) {
+        console.log(separratedKeyEle[i])
+    }
+    
 
     // Font-color Dom
     function changeFontColor() {

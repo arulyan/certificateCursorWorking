@@ -53,7 +53,7 @@ app.post('/', upload.single('image'), (req, res, next) => {
         }
         tempWidth = widthO
         tempHeight = heightO
-        res.render('image.ejs', { url: correctPath, name: req.file.filename, width: widthO, height: heightO })
+        res.render('image.ejs', { url: correctPath, name: req.file.filename, width: widthO, height: heightO,keys:keys })
         // res.send("Image Uploaded")
     }
 })
@@ -127,7 +127,8 @@ app.post('/uploadCertificate/resize/uploads/:path', (req, res) => {
     // })
 })
 
-app.post('/resize/uploads/:path/excel', upload.single('excel'), (req, res, next) => {
+var keys
+app.post('/resize/uploads/excel', upload.single('excel'), (req, res, next) => {
     if (!req.file) {
         res.send("Please Upload an image")
     }
@@ -139,6 +140,11 @@ app.post('/resize/uploads/:path/excel', upload.single('excel'), (req, res, next)
         var ws = wb.Sheets["Sheet1"]
         var data = xlsx.utils.sheet_to_json(ws)
         console.log(data)
+        keys = [];
+        for (var k in data[0]) {
+            keys.push(k)
+        }
+        console.log("total:"+keys.length+"keys:"+keys[0])
         //Able to extract the Name values
         data.forEach((item) => {
             console.log(item.Email)
