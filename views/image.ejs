@@ -3,7 +3,7 @@
 <canvas id="hotspot_image" width="<%=width%>" height="<%=height%>" name="hotspot_image"
     style="cursor:crosshair;background:url(<%=url%>);background-size:contain;background-repeat: no-repeat"></canvas>
 
-<form method="post" action="/uploadCertificate/resize/uploads/<%=name%>">
+<form method="post" action="/trialItUp/<%=name%>/<%=boxNo%>">
     <h1>Width of image</h1>
     <p id="widt"><%=width%></p>
     <h1>Height of image</h1>
@@ -13,7 +13,7 @@
     <input type="hidden" id="xStart" name="a">
     <input type="hidden" id="yStart" name="b">
     <input type="hidden" id="wid" name="c">
-    <input type="hidden" id="hei" name="d"> 
+    <input type="hidden" id="hei" name="d">
     <input type="hidden" id="trial" name="e">
     <!-- Font Color -->
     <h2>Font Color</h2>
@@ -26,7 +26,12 @@
     <button type="submit">Mortal Kombat</button>
     <!-- <button type="button" onclick="getHim()">Get Him</button> -->
 </form>
-    <input type="hidden" value="<%=keys%>" id="myKeys">
+<input type="hidden" value="<%=keys%>" id="myKeys">
+<select id="infos">
+</select>
+<form method="post" action="/getHim">
+    <button type="submit">Finish Him</button>
+</form>
 <!-- <button type="button" onclick="fo()">Submit Form</button> -->
 <!-- <h2 id="myDIV">Preview</h2>
 <img src="../modified/output-7-3-2020.png" id="ima"> -->
@@ -56,14 +61,63 @@
     //         console.log(res)
     //     })
     // }
-    var keyEle = []
+    var keyEle = [],indexVal = 0
     keyEle = document.getElementById("myKeys").value
     separratedKeyEle = keyEle.split(',')
-    console.log(typeof(separratedKeyEle))
-    for(var i=0;i<keyEle.length;i++) {
+    console.log(typeof (separratedKeyEle))
+    for (var i = 0; i < keyEle.length; i++) {
         console.log(separratedKeyEle[i])
     }
-    
+
+    function myFunction() {
+        var opt = []
+
+        //New
+        for (var i = 0; i < separratedKeyEle.length; i++) {
+            opt[i] = document.createElement('option')
+            opt[i].appendChild(document.createTextNode(separratedKeyEle[i]));
+            opt[i].value = separratedKeyEle[i]
+        }
+        //New Close
+
+        // var opt1 = document.createElement('option');
+        // var opt2 = document.createElement('option');
+        // var opt3 = document.createElement('option');
+
+        // opt1.appendChild(document.createTextNode('a'));
+        // opt2.appendChild(document.createTextNode('b'));
+        // opt3.appendChild(document.createTextNode('c'));
+
+        // opt1.value = 'Ash';
+        // opt2.value = 'BlackBeard';
+        // opt3.value = 'Valkyrie';
+        sel = document.getElementById("infos")
+        //New start
+        for (var i = 0; i < separratedKeyEle.length; i++) {
+            sel.appendChild(opt[i])
+        }
+        //New close
+
+        // sel[k].appendChild(opt1);
+        // sel[k].appendChild(opt2);
+        // sel[k].appendChild(opt3);
+        sel.addEventListener("change", consoleIt)
+        var sele = document.getElementById("trial")
+        function consoleIt(e) {
+            console.log(e.path[0].id)
+            // const ele = document.getElementById(e.path[0].id)
+            idName = e.path[0].id
+            lastDigit = parseInt(idName[idName.length - 1], 10)
+            console.log(lastDigit)
+            console.log("Showing the Value:"+sel.value)
+            document.getElementById("trial").value = sel.value;
+            // ele.addEventListener("change")
+        }
+        sele.value = sel.value
+        console.log("Initial Value:"+sel.value)
+    }
+
+    myFunction()
 
     // Font-color Dom
     function changeFontColor() {
@@ -111,7 +165,7 @@
         if (rect.w === undefined) {
             rect.startX = mouseY;
             rect.startY = mouseX;
-            dragBR = true;
+            dragBR = true; //bottom right corner
         }
 
         // if there is, check which corner
@@ -142,7 +196,7 @@
             // handle not resizing
         }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
         draw();
 
     }
@@ -178,7 +232,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         draw();
     }
-
+    // Making an array of all the rect var
     function draw() {
         ctx.fillStyle = "#222222";
         var a, b, c, d;
@@ -187,16 +241,16 @@
         c = rect.w;
         d = rect.h;
         var boxData = {
-            "a":rect.startX,
-            "b":rect.startY,
-            "c":rect.w,
-            "d":rect.h
+            "a": rect.startX,
+            "b": rect.startY,
+            "c": rect.w,
+            "d": rect.h
         }
         document.getElementById("xStart").value = a;
         document.getElementById("yStart").value = b;
         document.getElementById("wid").value = c;
         document.getElementById("hei").value = d;
-        document.getElementById("trial").value = JSON.stringify(boxData);
+        
         ctx.rect(rect.startX, rect.startY, rect.w, rect.h);
         ctx.stroke();
         console.log("startX:" + rect.startX + " startY:" + rect.startY + "\nrect.w:" + rect.w + " rect.h:" + rect.h)

@@ -33,8 +33,11 @@ app.get('/', (req, res) => {
     res.render('index')
 })
 
-var tempWidth,tempHeight
+//Some Global Variables
 
+var tempWidth, tempHeight
+var globalImg
+var originalWidth, originalHeight
 app.post('/', upload.single('image'), (req, res, next) => {
     if (!req.file) {
         res.send("Please Upload an image")
@@ -53,21 +56,36 @@ app.post('/', upload.single('image'), (req, res, next) => {
         }
         tempWidth = widthO
         tempHeight = heightO
-        res.render('image.ejs', { url: correctPath, name: req.file.filename, width: widthO, height: heightO,keys:keys })
+        globalImg = req.file.filename
+        var boxNo = 0
+        res.render('image.ejs', { url: correctPath, name: req.file.filename, width: widthO, height: heightO, keys: keys, boxNo: boxNo })
         // res.send("Image Uploaded")
     }
 })
 var imagery;
-app.post('/uploadCertificate/resize/uploads/:path', (req, res) => {
+var k = 0
+var GlobalModifiedLatestImg, globalImgData = [], globalImgDataAllBoxes = [], max
+app.post('/trialItUp/:path/:no', (req, res) => {
     //date naming
     var d = new Date()
     var day = d.getDate()
     var month = d.getMonth()
     var year = d.getFullYear()
+    var time = d.getTime()
+    var urlImg = req.params.path
+    var boxNo = parseInt(req.params.no)
     //getting orig image path n getting its orig dim which is used in calc. the coordinates
-    var image = "./uploads/" + req.params.path
-    imagery = image
-    console.log("This is the params:" + req.params)
+    console.log("this is the 1st alfa:" + urlImg[0])
+    var image
+    if (k == 0 || urlImg[0] != 'o') {
+        image = "./uploads/" + urlImg
+        k++
+    }
+    else {
+        image = "./modified/" + urlImg
+    }
+    // imagery = image
+    console.log("This is the params:" + req.params.path)
     const dimensions = imagesize(image)
     const origWidth = dimensions.width
     const origHeight = dimensions.height
@@ -76,6 +94,80 @@ app.post('/uploadCertificate/resize/uploads/:path', (req, res) => {
     // //Getting form data from ejs
     var fontColor = req.body.fontColor
     var fontSize = req.body.fontSize
+    var selection = req.body.e
+    mrX = (req.body.a) * origWidth / tempWidth;
+    mrY = (req.body.b) * origHeight / tempHeight;
+    mrWidth = (req.body.c) * origWidth / tempWidth;
+    mrHeight = (req.body.d) * origHeight / tempHeight;
+    var obj = {
+        "fontColor": fontColor,
+        "fontSize": fontSize,
+        "mrX": mrX,
+        "mrY": mrY,
+        "mrWidth": mrWidth,
+        "mrHeight": mrHeight,
+        "selection": selection
+    }
+    globalImgData[boxNo] = obj
+    globalImgDataAllBoxes = []
+    for (var i = 0; i <= boxNo; i++) {
+        globalImgDataAllBoxes.push(globalImgData[i])
+        console.log("So this is the End Game:\n" + globalImgData[i].selection + "\nThis is God!:\n" + globalImgDataAllBoxes[i].selection)
+    }
+    console.log("this is the box Data Dammit!" + globalImgData[0].selection)
+    boxNo++
+    max = boxNo
+    console.log(obj)
+    console.log("this is the selection:" + selection + "\n" + typeof (selection))
+    // coorObj = JSON.parse(req.body.e)
+    // console.log("Lets See how the trial looks like:\n" + coorObj.a)
+    const img = gm(image)
+        .fill(fontColor)
+        .font('Arial', fontSize)
+    // img.resize(width, height)
+    // console.log("xx:" + xx + "\n" + "yy:" + yy)
+    img.region(mrWidth, mrHeight, mrX, mrY).drawText(0, 0, onePersonData[selection], 'center');
+    var filename = 'output' + '-' + time + '.png'
+    var outputImgPath = '/modified/' + filename
+    GlobalModifiedLatestImg = './modified/' + filename
+    // Getting out img path n showing that img in preview.ejs, also sending the img dimensions
+
+    var widthO = dimensions.width
+    var heightO = dimensions.height
+    const ratio = widthO / heightO
+    // console.log(widthO + " lol: " + heightO + " blahblah " + ratio)
+    if (widthO > 800) {
+        widthO = 800
+        heightO = widthO / ratio
+    }
+
+    //Appliying effects over the image
+    img.write('./modified/' + filename, err => {
+        if (err) return console.error(err);
+        console.log(outputImgPath)
+        console.log('done');
+        res.render('image.ejs', { url: outputImgPath, name: filename, width: widthO, height: heightO, keys: keys, boxNo: boxNo })
+    });
+})
+
+app.post('/getHim', (req, res) => {
+    //date naming
+    var d = new Date()
+    var day = d.getDate()
+    var month = d.getMonth()
+    var year = d.getFullYear()
+    //getting orig image path n getting its orig dim which is used in calc. the coordinates
+    var image = "./uploads/" + globalImg //Imp, the path of the blank Certificate
+    // imagery = image
+    // console.log("This is the params:" + req.params)
+    // const dimensions = imagesize(image)
+    // const origWidth = dimensions.width
+    // const origHeight = dimensions.height
+    // console.log("Brosky Dosky" + origWidth)
+
+    // //Getting form data from ejs
+    // var fontColor = req.body.fontColor
+    // var fontSize = req.body.fontSize
 
     // //getting x n y coordinates
     // var xx = req.body.x
@@ -88,41 +180,49 @@ app.post('/uploadCertificate/resize/uploads/:path', (req, res) => {
     // console.log("the color is:" + fontColor)
     // .resize(width, height)
 
-    mrX = (req.body.a)*origWidth/tempWidth;
-    mrY = (req.body.b)*origHeight/tempHeight;
-    mrWidth = (req.body.c)*origWidth/tempWidth;
-    mrHeight = (req.body.d)*origHeight/tempHeight;
-    coorObj = JSON.parse(req.body.e)
-    console.log("Lets See how the trial looks like:\n"+coorObj.a)
-    const img = gm(image)
-        .fill(fontColor)
-        .font('Arial', fontSize)
-    // img.resize(width, height)
-    // console.log("xx:" + xx + "\n" + "yy:" + yy)
-    img.region(mrWidth, mrHeight, mrX, mrY).drawText(0, 0, 'John Doe', 'center');
+    // mrX = (req.body.a) * origWidth / tempWidth;
+    // mrY = (req.body.b) * origHeight / tempHeight;
+    // mrWidth = (req.body.c) * origWidth / tempWidth;
+    // mrHeight = (req.body.d) * origHeight / tempHeight;
+    // coorObj = JSON.parse(req.body.e)
+    // console.log("Lets See how the trial looks like:\n" + coorObj.a)
+    for (var j = 0; j < allPeopleData.length; j++) {
+        var img = gm(image)
+        for (var i = 0; i < max; i++) {
+            localSelection = globalImgDataAllBoxes[i].selection
+            img.fill(globalImgDataAllBoxes[i].fontColor)
+            img.font('Arial', globalImgDataAllBoxes[i].fontSize)
+            // img.resize(width, height)
+            // console.log("xx:" + xx + "\n" + "yy:" + yy)
+            img.region(globalImgDataAllBoxes[i].mrWidth, globalImgDataAllBoxes[i].mrHeight, globalImgDataAllBoxes[i].mrX, globalImgDataAllBoxes[i].mrY).drawText(0, 0, allPeopleData[j][localSelection], 'center');
+        }
+        console.log("This shud be selection:"+allPeopleData[j][localSelection])
+        var outputImgPath = '/modified/' + allPeopleData[j].Name + '-' + day + '-' + month + '-' + year + '.png'
+        img.write('./modified/' + allPeopleData[j].Name + '-' + day + '-' + month + '-' + year + '.png', err => {
+            if (err) return console.error(err);
+            console.log(outputImgPath)
+            console.log('done');
+        });
+    }
+    res.status(204).send()
     // img.region(mrWidth, mrHeight, mrX, mrY).drawText(300,300,'22-may-2020')
     // img.region(mrWidth, mrHeight, mrX, mrY).drawText(600,600,"World Champion")
     // img.drawText(500, 500, "Arulyan Asokan");
-    var outputImgPath = '/modified/output' + '-' + day + '-' + month + '-' + year + '.png'
+
 
     // Getting out img path n showing that img in preview.ejs, also sending the img dimensions
 
-    var widthO = dimensions.width
-    var heightO = dimensions.height
-    const ratio = widthO / heightO
-    console.log(widthO + " lol: " + heightO + " blahblah " + ratio)
-    if (widthO > 800) {
-        widthO = 800
-        heightO = widthO / ratio
-    }
+    // var widthO = dimensions.width
+    // var heightO = dimensions.height
+    // const ratio = widthO / heightO
+    // console.log(widthO + " lol: " + heightO + " blahblah " + ratio)
+    // if (widthO > 800) {
+    //     widthO = 800
+    //     heightO = widthO / ratio
+    // }
 
     //Appliying effects over the image
-    img.write('./modified/output' + '-' + day + '-' + month + '-' + year + '.png', err => {
-        if (err) return console.error(err);
-        console.log(outputImgPath)
-        console.log('done');
-        res.render('preview.ejs', { url: outputImgPath, width: widthO, height: heightO, imgUrl: req.params.path })
-    });
+
     // .write('./modified/output.png', (err) => {
     //     if (err) {
     //         res.send(err)
@@ -131,7 +231,7 @@ app.post('/uploadCertificate/resize/uploads/:path', (req, res) => {
     // })
 })
 
-var keys
+var keys, onePersonData, allPeopleData
 app.post('/resize/uploads/excel', upload.single('excel'), (req, res, next) => {
     if (!req.file) {
         res.send("Please Upload an image")
@@ -143,12 +243,14 @@ app.post('/resize/uploads/excel', upload.single('excel'), (req, res, next) => {
         var wb = xlsx.readFile(excelFilePath)
         var ws = wb.Sheets["Sheet1"]
         var data = xlsx.utils.sheet_to_json(ws)
-        console.log(data)
+        allPeopleData = data
+        onePersonData = data[0]
+        console.log("So this is the data[0]:" + onePersonData["Name"])
         keys = [];
         for (var k in data[0]) {
             keys.push(k)
         }
-        console.log("total:"+keys.length+"keys:"+keys[0])
+        console.log("total:" + keys.length + "keys:" + keys[0])
         //Able to extract the Name values
         data.forEach((item) => {
             console.log(item.Email)
@@ -164,9 +266,9 @@ app.post("/checkinUp", (req, res) => {
         .fill('#000000')
         .font('Arial', 80)
     img.region(req.body.c, req.body.d, req.body.a, req.body.b).drawText(0, 0, 'Arulyan Asokan', 'center');
-    img.write('output' + '.png'   , (err) => {
+    img.write('output' + '.png', (err) => {
         if (err) {
-            res.send("is this sending err:"+err)
+            res.send("is this sending err:" + err)
         }
         res.download("/output.png")
     })
